@@ -5,31 +5,31 @@ clear
 wikiDB=pi_wiki
 wikiDBuser=mwki
 wikidir=/var/www/html/mediawiki
-backupdir=~/wikibackup
-timestamp=`date +%Y-%m-%d`
+timestamp=`date +%y.%m.%d-%H.%M`
+mkdir "$HOME/wikibackup/$timestamp"
+backupdir="$HOME/wikibackup/$timestamp"
 dbdump="$backupdir/wiki-$timestamp.sql.gz"
 xmldump="$backupdir/wiki-$timestamp.xml.gz"
 filedump="$backupdir/wiki-$timestamp.files.tar.gz"
-logfile="$backupdir/backup-$timestamp.log"
 
-echo "Wiki backup. Database: $wikiDB; User: $wikiDBuser; Directory: $wikidir; Backup to: $backupdir" | tee -a $logfile
+echo "Wiki backup. Database: $wikiDB; User: $wikiDBuser; Directory: $wikidir; Backup to: $backupdir"
 echo
 echo "creating database dump $dbdump..."
-mysqldump --user=$wikiDBuser $wikiDB | gzip > "$dbdump" | tee -a $logfile
+mysqldump --user=$wikiDBuser $wikiDB | gzip > "$dbdump"
 echo "Database dump complete"
 
 
 echo
-echo "creating XML dump $xmldump..." | tee -a $logfile
-cd "$wikidir/maintenance" | tee -a $logfile
-php -d error_reporting=E_ERROR dumpBackup.php --full | gzip > "$xmldump" | tee -a $logfile
-echo "XML dump complete" | tee -a $logfile
+echo "creating XML dump $xmldump..."
+cd "$wikidir/maintenance"
+php -d error_reporting=E_ERROR dumpBackup.php --full | gzip > "$xmldump"
+echo "XML dump complete"
 
 
 echo
-echo "creating file archive $filedump..." | tee -a $logfile
-cd "~" | tee -a $logfile
-tar -czvf "$filedump" "$wikidir" | tee -a $logfile
-echo "Filesystem backup complete" | tee -a $logfile
+echo "creating file archive $filedump..."
+cd "$HOME"
+tar -czvf "$filedump" "$wikidir"
+echo "Filesystem backup complete"
 echo
-echo "Wiki backup complete" | tee -a $logfile
+echo "Wiki backup complete"
