@@ -33,3 +33,7 @@ tar -czvf "$filedump" "$wikidir"
 echo "Filesystem backup complete"
 echo
 echo "Wiki backup complete"
+echo
+cd "$HOME/wikibackup"
+ls -t | sed -e '1,12d' | xargs -d '\n' rm
+echo "Log rotation complete"
