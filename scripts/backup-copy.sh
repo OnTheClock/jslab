@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rsync $HOME/wikibackup/ joel@raspi2:/home/joel/wikibackup2/
+rsync -r --delete $HOME/wikibackup/ joel@raspi2:/home/joel/wikibackup2/
