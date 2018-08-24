@@ -35,5 +35,5 @@ echo
 echo "Wiki backup complete"
 echo
 cd "$HOME/wikibackup"
-ls -t | sed -e '1,12d' | xargs -d '\n' rm
+ls -t | sed -e '1,12d' | xargs -d '\n' rm -r
 echo "Log rotation complete"
