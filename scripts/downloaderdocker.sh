@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo apt -y install nfs-common
+
 sudo docker pull linuxserver/transmission
 sudo docker pull linuxserver/sabnzbd
 
