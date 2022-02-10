@@ -5,4 +5,4 @@ sudo echo deb http://download.webmin.com/download/repository sarge contrib >> /e
 
 wget -q -O- http://www.webmin.com/jcameron-key.asc | sudo apt-key add
 sudo apt update
-sudo apt install webmin -y
+sudo apt -y install webmin
