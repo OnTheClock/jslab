@@ -30,6 +30,7 @@ sudo docker run -d \
   --name=nzbget \
   -e PUID=223 \
   -e PGID=321 \
+  -e UMASK=002 \
   -e TZ=Pacific/Honolulu \
   -p 6789:6789 \
   -v ~/media/appdata/nzbget:/config \
