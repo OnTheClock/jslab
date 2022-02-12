@@ -2,8 +2,12 @@
 
 sudo apt -y install nfs-common
 
+mkdir /home/joel/media
+sudo nano "192.168.1.3:/home/joel/media /home/joel/media  nfs      defaults    0       0" > /etc/fstab
+
 sudo docker pull linuxserver/transmission
-sudo docker pull linuxserver/sabnzbd
+#sudo docker pull linuxserver/sabnzbd
+sudo docker pull linuxserver/nzbget
 
 sudo docker run -d \
   --name=transmission \
@@ -23,13 +27,24 @@ sudo docker run -d \
   linuxserver/transmission
   
 sudo docker run -d \
-  --name=sabnzbd \
-  -e PUID=333 \
+  --name=nzbget \
+  -e PUID=223 \
   -e PGID=321 \
-  -e UMASK=002 \
   -e TZ=Pacific/Honolulu \
-  -p 8080:8080 \
-  -v ~/media/appdata/sabnzbd:/config \
-  -v ~/media/data/usenet:/data/usenet  \
+  -p 6789:6789 \
+  -v ~/media/appdata/nzbget:/config \
+  -v ~/media/data/usenet:/data/usenet \
   --restart unless-stopped \
-  linuxserver/sabnzbd
+  linuxserver/nzbget
+  
+#sudo docker run -d \
+#  --name=sabnzbd \
+#  -e PUID=333 \
+#  -e PGID=321 \
+#  -e UMASK=002 \
+#  -e TZ=Pacific/Honolulu \
+#  -p 8080:8080 \
+#  -v ~/media/appdata/sabnzbd:/config \
+#  -v ~/media/data/usenet:/data/usenet  \
+#  --restart unless-stopped \
+#  linuxserver/sabnzbd
