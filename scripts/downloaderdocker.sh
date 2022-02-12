@@ -62,6 +62,6 @@ echo "Started nzbget"
 #  --restart unless-stopped \
 #  linuxserver/sabnzbd
 
-echo "Press any key then enter to reboot"
+read -sp 'Press any key to reboot'
 
 sudo reboot -h now
