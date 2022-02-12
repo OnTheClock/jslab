@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo echo downloader > /etc/hostname
+
 sudo apt -y install nfs-common
 
 mkdir /home/joel/media
@@ -49,3 +51,5 @@ sudo docker run -d \
 #  -v ~/media/data/usenet:/data/usenet  \
 #  --restart unless-stopped \
 #  linuxserver/sabnzbd
+
+sudo reboot -h now
