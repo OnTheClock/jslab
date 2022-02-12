@@ -7,7 +7,7 @@ sudo apt -y install nfs-common
 echo "Installed nfs-common"
 
 mkdir /home/joel/media
-sudo nano "192.168.1.3:/home/joel/media /home/joel/media  nfs      defaults    0       0" >> /etc/fstab
+sudo echo "192.168.1.3:/home/joel/media /home/joel/media  nfs      defaults    0       0" >> /etc/fstab
 echo "Created media folder and added nfs share to fstab"
 
 sudo mount -a
