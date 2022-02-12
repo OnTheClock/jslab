@@ -1,15 +1,22 @@
 #!/bin/sh
 
 sudo echo downloader > /etc/hostname
+echo "Changed hostname to downloader"
 
 sudo apt -y install nfs-common
+echo "Installed nfs-common"
 
 mkdir /home/joel/media
 sudo nano "192.168.1.3:/home/joel/media /home/joel/media  nfs      defaults    0       0" >> /etc/fstab
+echo "Created media folder and added nfs share to fstab"
+
+sudo mount -a
+echo "Mounted nfs share"
 
 sudo docker pull linuxserver/transmission
 #sudo docker pull linuxserver/sabnzbd
 sudo docker pull linuxserver/nzbget
+echo "Pulled docker images"
 
 sudo docker run -d \
   --name=transmission \
@@ -28,6 +35,8 @@ sudo docker run -d \
   --restart unless-stopped \
   linuxserver/transmission
   
+echo "Started transmission"
+
 sudo docker run -d \
   --name=nzbget \
   -e PUID=223 \
@@ -39,7 +48,8 @@ sudo docker run -d \
   -v ~/media/data/usenet:/data/usenet \
   --restart unless-stopped \
   linuxserver/nzbget
-  
+
+echo "Started nzbget"
 #sudo docker run -d \
 #  --name=sabnzbd \
 #  -e PUID=333 \
@@ -51,5 +61,7 @@ sudo docker run -d \
 #  -v ~/media/data/usenet:/data/usenet  \
 #  --restart unless-stopped \
 #  linuxserver/sabnzbd
+
+echo "Press any key then enter to reboot"
 
 sudo reboot -h now
