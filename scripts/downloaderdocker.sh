@@ -62,7 +62,7 @@ echo "Started nzbget"
 #  --restart unless-stopped \
 #  linuxserver/sabnzbd
 
-read -sp 'Press any key to reboot'
+read -p 'Press any key then enter to reboot' var1
 
 sudo dhclient -r
 sudo reboot -h now
