@@ -5,7 +5,7 @@ sudo echo downloader > /etc/hostname
 sudo apt -y install nfs-common
 
 mkdir /home/joel/media
-sudo nano "192.168.1.3:/home/joel/media /home/joel/media  nfs      defaults    0       0" > /etc/fstab
+sudo nano "192.168.1.3:/home/joel/media /home/joel/media  nfs      defaults    0       0" >> /etc/fstab
 
 sudo docker pull linuxserver/transmission
 #sudo docker pull linuxserver/sabnzbd
