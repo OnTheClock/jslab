@@ -64,4 +64,5 @@ echo "Started nzbget"
 
 read -sp 'Press any key to reboot'
 
+sudo dhclient -r
 sudo reboot -h now
