@@ -19,3 +19,5 @@ sudo docker run -d \
   --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
   --restart unless-stopped \
   linuxserver/wireguard
+
+sudo docker logs wireguard
