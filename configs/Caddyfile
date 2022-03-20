@@ -1,0 +1,76 @@
+caddy.jktech.ddns.net:443 {
+
+	reverse_proxy 192.168.1.5:10000
+
+}
+
+
+caddy.lan:80 {
+	redir /radarr /radarr/
+	redir /sonarr /sonarr/
+	redir /jackett /jackett/
+    redir /ombi /ombi/
+    redir /sab /sab/
+    redir /transmission /transmission/
+
+	reverse_proxy /ombi/* {
+		to jserv.lan:3579
+	}
+
+	reverse_proxy /sab/* {
+		to 192.168.1.4:8080
+	}
+
+	reverse_proxy /transmission/* {
+		to 192.168.1.4:9117
+	}
+
+	reverse_proxy /radarr/* {
+		to jserv.lan:7878
+	}
+ 
+	reverse_proxy /sonarr/* {
+		to jserv.lan:8989
+	}
+	
+    reverse_proxy /jackett/* {
+		to jserv.lan:9117
+	}
+
+	# Set this path to your site's directory.
+	root * /usr/share/caddy
+ 
+}
+
+jktech.ddns.net:443 {
+	redir /ombi /ombi/
+	reverse_proxy /ombi/* {
+		to jserv.lan:3579
+	}
+ 
+	reverse_proxy /ombi/* {
+		to jserv.lan:3579
+	}
+
+
+	# Set this path to your site's directory.
+	root * /usr/share/caddy
+ 
+}
+
+caddy.lan:443 {
+
+	redir /jserv /jserv/
+    redir /downloader /downloader/
+	redir /caddy /caddy/
+    reverse_proxy /jserv/* {
+		to jserv.lan:10000
+	}
+	reverse_proxy /downloader/* {
+		to downloader.lan:10000
+	}
+    	reverse_proxy /caddy/* {
+		to caddy.lan:10000
+	}
+
+}
