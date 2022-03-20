@@ -25,8 +25,8 @@ sudo docker run -d \
   -e UMASK=002 \
   -e TZ=Pacific/Honolulu \
   -e TRANSMISSION_WEB_HOME=/combustion-release/ \
-  -e USER=joel \
-  -e PASS=JtK662001 \
+  -e USER=user \
+  -e PASS=pass \
   -p 9091:9091 \
   -p 51413:51413 \
   -p 51413:51413/udp \
