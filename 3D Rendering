@@ -3,7 +3,9 @@ var $pivot_io = 1
 var $orescanner_io = 3
 var $terrainscanner_io = 0
 
-var $vscreen = virtualscreen(100,100)
+var $bufferscreen = screen(6,2)
+var $coordscreen = screen(6,1)
+
 
 var $radius = 6400000
 var $ranges = 100
@@ -11,7 +13,7 @@ var $stepsize = 80000
 var $offsetx : number
 var $offsety : number
 var $scale : number
-var $distancefromcam = 100000000
+var $distancefromcam = 18000000
 
 var $A = 0
 var $B = 0
@@ -26,6 +28,7 @@ var $z : number
 var $xp : number
 var $yp : number
 var $zp = 200
+var $ooz : number
 
 var $i : number
 var $j : number
@@ -49,20 +52,15 @@ function @setscreen()
 	$offsety = $screen.height / 2
 
 
-function @generatelonlat()
-	for -17,18 ($u)
-		$longitudes.append($u * 10 / 360 * 2 * pi)
-	for -9,9 ($p)
-		$latitudes.append($p *10 / 360 * 2 * pi)
-		
+
 		
 
 
-function @calculateijk($lon:number , $lat:number) : text
-	$i = $radius * sin($lon) * cos($lat)
+function @calculateijk($lon:number , $lat:number)
+	$i = $radius * sin(-$lon) * cos($lat)
 	$j = $radius * sin($lat)
-	$k = $radius * cos($lat) * cos($lon)
-	return ".i{$i}.j{$j}.k{$k}"
+	$k = $radius * cos($lat) * cos(-$lon)
+
 
 function @calculatexyz($u:text)
 	$x = $scale *  $j * sin($A) * sin($B) * cos($C) - $k * cos($A) * sin($B) * cos($C) + $j * cos($A) * sin($C) + $k * sin($A) * sin($C) + $i * cos($B) * cos($C)
@@ -70,44 +68,10 @@ function @calculatexyz($u:text)
 	$z = $distancefromcam + $scale * $k * cos($A) * cos($B) - $j * sin($A) * cos($B) + $i * sin($B)
 	
 	
-function @calculateforsurface($lon:number,$lat:number) : text
-	@calculatexyz(@calculateijk($lon , $lat))
-	var $ooz = 1 / ($z + 0.001) 
+function @calculateprojection()
+	$ooz = 1 / ($z) 
 	$yp = $offsety + $scale *$y * $zp * $ooz
 	$xp = $offsetx + $scale *$x * $zp * $ooz
-	if $ooz > $buffer
-		$opacity = 255
-	else
-		$opacity = 0
-	return text(".x{}.y{}",$xp,$yp)
-
-function @displaysphere()
-	$screen.blank()
-	foreach $longitudes ($u , $lon)
-		foreach $latitudes ($p , $lat)
-			@calculateforsurface($lon,$lat)
-			$dot = color(($lon + pi) / (2 * pi) * 255,0,(1 - ($lon + pi) / (2*pi)) * 255,255)
-			#if $lon == 0
-				#$dot = color(255,0,0,255)
-			if $lat == 0
-				$dot = color(255,255,255,255)
-			#if $lon == pi
-			#	$dot = color(0,255,0,255)
-			#else
-				#$dot = color($lon,255-$lon,0,$opacity)
-			$screen.draw_point($xp, $yp, black)
-			$screen.draw_point($xp, $yp, $dot)
-	$A = $A + 0.01
-	$B = $b + 0.01
-	$C = $C + 0.0
-	if $distancefromcam > $radius * 1.1
-		$distancefromcam = $distancefromcam - 80000
-	$vscreen.blank(red)
-	var $testcolor = color(0,0,255,0)
-	print($testcolor)
-	print($screen.pixel(170,170))
-		
-		
 
 
 function @terrainscanning ($r:number)
@@ -118,7 +82,7 @@ function @terrainscanning ($r:number)
 		var $terraindata = input_text($terrainscanner_io,$n)
 		var $lat = $arclength * cos(input_number($pivot_io,0)* 2 * pi) / 6400000
 		var $lon = $arclength * sin(input_number($pivot_io,0)* 2 * pi) / 6400000
-		@calculateforsurface($lon,$lat)
+		@calculateprojection($lon,$lat)
 		var $terraindot = color(0,255,0, clamp(abs($terraindata) / 3000 * 255, 0 , $opacity))
 		if $terraindata < 0
 			$terraindot = color(0,0,255, clamp(abs($terraindata) / 3000 * 255, 0 , $opacity))
@@ -127,16 +91,42 @@ function @terrainscanning ($r:number)
 		$screen.draw_point($xp, $yp, black)
 		$screen.draw_point($xp, $yp, $terraindot)
 
-	
-function @scanning()
-	@terrainscanning($ranges)
-			
-init
-	@generatelonlat()
-	@setscreen()
-	@setradarsize()
-	@setresolution()
-	output_number($pivot_io,0,0.03)
-update
-	@displaysphere()
-	#@scanning()	
+function @convertrad($angle:number) : number
+	return $angle * 2pi / 360
+
+function @generatecoordmap()
+	for -90,90 ($p)
+		for -9,9 ($s)
+			var $radp = @convertrad($p) * 2
+			var $rads = @convertrad($s) * 10
+			#var $coordcolor = color(($radp + pi) / 2pi * 255,0,(1 - ($radp + pi) / 2pi) * 255,255)
+			var $coordcolor = color(50,50,50,255)
+			$coordscreen.draw_point($p*2+180,$s*10+90,$coordcolor)
+
+function @updatebuffer($p:number,$s:number)
+	var $scaleooz = $z /($distancefromcam + $radius)
+	print($scaleooz *255)
+	if $ooz*255*$distancefromcam/2 > color_r($bufferscreen.pixel($xp,$yp))
+		$bufferscreen.draw_point($xp,$yp,black)
+		$bufferscreen.draw_point($xp,$yp,color($scaleooz*255,0,0,255))
+		$screen.draw_circle($xp,$yp,1,$coordscreen.pixel($p+180,$s+90))
+
+#	print(color_r($coordscreen.pixel($p*10+180,$s*10+90)))
+
+function @drawfrommap()
+	$screen.blank()
+	$coordscreen.text_size(10)
+	$coordscreen.write(20,60,white,"TEST")
+	$bufferscreen.blank()
+
+	for -90,90 ($p)
+		for -9,9 ($s)
+			var $radp = @convertrad($p) * 2
+			var $rads = @convertrad($s) * 10
+			@calculateijk($radp,$rads)
+			@calculatexyz()
+			@calculateprojection()
+			@updatebuffer($p*2,$s*10)
+	$A = $a + 0.005
+	$B = $b - 0.01
+	$C = $C + 0.01
