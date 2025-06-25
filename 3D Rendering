@@ -3,13 +3,15 @@ var $pivot_io = 1
 var $orescanner_io = 3
 var $terrainscanner_io = 0
 
+var $vscreen = virtualscreen(100,100)
+
 var $radius = 6400000
 var $ranges = 100
 var $stepsize = 80000
 var $offsetx : number
 var $offsety : number
 var $scale : number
-var $distancefromcam = 26650000
+var $distancefromcam = 100000000
 
 var $A = 0
 var $B = 0
@@ -46,11 +48,15 @@ function @setscreen()
 	$offsetx = $screen.width / 2
 	$offsety = $screen.height / 2
 
+
 function @generatelonlat()
 	for -17,18 ($u)
 		$longitudes.append($u * 10 / 360 * 2 * pi)
-	for -90,90 ($p)
-		$latitudes.append($p / 360 * 2 * pi)
+	for -9,9 ($p)
+		$latitudes.append($p *10 / 360 * 2 * pi)
+		
+		
+
 
 function @calculateijk($lon:number , $lat:number) : text
 	$i = $radius * sin($lon) * cos($lat)
@@ -62,6 +68,7 @@ function @calculatexyz($u:text)
 	$x = $scale *  $j * sin($A) * sin($B) * cos($C) - $k * cos($A) * sin($B) * cos($C) + $j * cos($A) * sin($C) + $k * sin($A) * sin($C) + $i * cos($B) * cos($C)
 	$y = $scale * $j * cos($A) * cos($C) + $k * sin($A) * cos($C) - $j * sin($A) * sin($B) * sin($C) + $k * cos($A) * sin($B) * sin($C) - $i * cos($B) * sin($C)
 	$z = $distancefromcam + $scale * $k * cos($A) * cos($B) - $j * sin($A) * cos($B) + $i * sin($B)
+	
 	
 function @calculateforsurface($lon:number,$lat:number) : text
 	@calculatexyz(@calculateijk($lon , $lat))
@@ -79,13 +86,15 @@ function @displaysphere()
 	foreach $longitudes ($u , $lon)
 		foreach $latitudes ($p , $lat)
 			@calculateforsurface($lon,$lat)
-			$dot = color(0,0,255,$opacity)
-			if $lon == 0
-				$dot = color(255,0,0,$opacity)
+			$dot = color(($lon + pi) / (2 * pi) * 255,0,(1 - ($lon + pi) / (2*pi)) * 255,255)
+			#if $lon == 0
+				#$dot = color(255,0,0,255)
 			if $lat == 0
-				$dot = color(255,255,255,$opacity)
-			if $lon == pi
-				$dot = color(0,255,0,$opacity)
+				$dot = color(255,255,255,255)
+			#if $lon == pi
+			#	$dot = color(0,255,0,255)
+			#else
+				#$dot = color($lon,255-$lon,0,$opacity)
 			$screen.draw_point($xp, $yp, black)
 			$screen.draw_point($xp, $yp, $dot)
 	$A = $A + 0.01
@@ -93,6 +102,13 @@ function @displaysphere()
 	$C = $C + 0.0
 	if $distancefromcam > $radius * 1.1
 		$distancefromcam = $distancefromcam - 80000
+	$vscreen.blank(red)
+	var $testcolor = color(0,0,255,0)
+	print($testcolor)
+	print($screen.pixel(170,170))
+		
+		
+
 
 function @terrainscanning ($r:number)
 	repeat $r ($n)
@@ -111,6 +127,7 @@ function @terrainscanning ($r:number)
 		$screen.draw_point($xp, $yp, black)
 		$screen.draw_point($xp, $yp, $terraindot)
 
+	
 function @scanning()
 	@terrainscanning($ranges)
 			
